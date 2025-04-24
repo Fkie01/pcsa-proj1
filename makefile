@@ -3,8 +3,8 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
-TARGET = mysh
-SRC = main.cpp parser.cpp
+TARGET = icsh
+SRC = icsh.cpp parser.cpp
 
 all: $(TARGET)
 
