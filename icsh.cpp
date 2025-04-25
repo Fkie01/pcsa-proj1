@@ -1,6 +1,8 @@
 
 #include "execute.hpp"
 #include "parser.hpp"
+#include "signalHandle.hpp"
+#include <csignal>
 #include <cstdlib> // free
 #include <cstring> // strdup
 #include <fstream>
@@ -12,6 +14,7 @@
 #include <vector>
 
 int main(int argc, char *argv[]) {
+  setupSignalHandlers();
   std::istream *inputStream = &std::cin;
   std::ifstream fileStream;
 
@@ -38,6 +41,8 @@ int main(int argc, char *argv[]) {
     if (!std::getline(*inputStream, input)) {
       break;
     }
+
+    // setupSignalHandlers();
 
     // Handle !!
     if (input == "!!") {
