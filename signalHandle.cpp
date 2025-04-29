@@ -16,7 +16,7 @@ void signalHandler(int signum) {
     break;
   }
 
-  cout << "Signal " << signal << " received." << endl;
+  cout << " Signal " << signal << " received." << endl;
   cout << "icsh $ " << flush;
 }
 

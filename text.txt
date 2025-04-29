@@ -1,0 +1,4 @@
+helloworld
+icsh $ args size: 1
+
+bye

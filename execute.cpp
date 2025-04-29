@@ -18,7 +18,7 @@ int executeCommand(const std::vector<std::string> &args) {
   int exitCode = 0;
 
   if (pid == 0) {
-    if (execvp(c_args[0], c_args.data()) == -1) {
+    if (execvp(c_args[0], c_args.data()) ) {
       std::cerr << "Error executing command: " << c_args[0] << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -37,3 +37,4 @@ int executeCommand(const std::vector<std::string> &args) {
   }
   return exitCode;
 }
+
