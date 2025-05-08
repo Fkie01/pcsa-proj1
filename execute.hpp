@@ -4,5 +4,5 @@
 #include <string>
 #include <vector>
 
-int executeCommand(const std::vector<std::string> &args);
+int executeCommand(const std::vector<std::string> &args, bool background);
 #endif // EXECUTE_HPP

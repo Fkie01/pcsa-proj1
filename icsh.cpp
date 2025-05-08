@@ -3,6 +3,7 @@
 #include "isRedirection.hpp"
 #include "parser.hpp"
 #include "signalHandle.hpp"
+#include "jobs.hpp"
 #include <csignal>
 #include <cstdlib> // free
 #include <cstring> // strdup
@@ -13,10 +14,13 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vector>
+
+
+
 
 #define MAX_LINE 1024
 #define MAX_ARGS 64
+// std::vector<Job> jobs;
 
 int main(int argc, char *argv[]) {
   setupSignalHandlers(); // handle ctrl-c and ctrl-z
@@ -42,14 +46,30 @@ int main(int argc, char *argv[]) {
   std::cout << "  -------------welcome to shell--------------\n";
 
   while (true) {
+    // setupSignalHandlers(); // handle ctrl-c and ctrl-z
     bool isRedirection = false;
+    bool background = false;
     // int redirectionPosition;
     if (inputStream == &std::cin) {
-      std::cout << "icsh $ ";
+      
+      write(STDOUT_FILENO, "icsh $ ",7);
+      std::cout << std::flush;
+      // std::cout << "icsh $ " << std::flush;
     }
-
+  //   if (need_new_prompt) {
+  //     need_new_prompt = 0;
+  //     std::cout << "icsh $ " << std::flush;
+  // }
+  
+    
     if (!std::getline(*inputStream, input)) {
-      break;
+      // break;
+      if (!inputStream) break;
+
+  // Handle Ctrl-C / Ctrl-Z interruption
+      std::cin.clear();                     // Clear error state
+      std::cout << std::endl;              // Force newline
+      continue;   
     }
 
     // setupSignalHandlers();
@@ -67,7 +87,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::vector<std::string> args = parseInput(input);
-    std::cout << "args size: " << args.size() << std::endl;
+    // std::cout << "args size: " << args.size() << std::endl;
     // std::cout << args[2] << std::endl;
 
     if (args.size() >= 1) {
@@ -78,6 +98,49 @@ int main(int argc, char *argv[]) {
         }
       }
     }
+
+    if (args.size() >= 1 && strcmp(args[0].c_str(), "jobs") == 0) { // print jobs 
+      print_jobs();
+      continue;
+    }
+
+    if (args.size() >= 1 && strcmp(args[0].c_str(), "fg") == 0) { // bring to foreground
+      if (args.size() == 2) {
+
+        if (args[1][0] == '%') {
+          args[1].erase(0, 1); // Remove the '%' character
+        }
+
+        // std::cout << args[1] << std::endl;
+        int jobId = std::stoi(args[1]);
+        
+        bringToForeground(jobId);
+      } else {
+        std::cerr << "Usage: fg <job_id>\n";
+      }
+      continue;
+    }
+    if (args.size() >= 1 && strcmp(args[0].c_str(), "bg") == 0) { // bring to background
+      if (args.size() == 2) {
+        if (args[1][0] == '%') {
+          args[1].erase(0, 1); // Remove the '%' character
+        }
+        int jobId = std::stoi(args[1]);
+        // std::cout << args[1] << std::endl;
+        bringToBackground(jobId);
+      } else {
+        std::cerr << "Usage: bg <job_id>\n";
+      }
+      continue;
+    }
+
+    if (!args.empty() && args.back() == "&") { // Check if the last argument is "&"
+      background = true;
+      args.pop_back();
+
+    }
+
+
 
     if (args.empty())
       continue;
@@ -107,9 +170,12 @@ int main(int argc, char *argv[]) {
       // std::cout << "icsh $ " << std::flush;
 
     } else {
-      exitCode = executeCommand(args);
+      exitCode = executeCommand(args, background);
+      // std::cout << "test" << std::flush;
     }
   }
+  
+
 
   return exitCode;
 }

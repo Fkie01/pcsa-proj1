@@ -4,8 +4,9 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
 TARGET = icsh
-SRC = icsh.cpp parser.cpp execute.cpp signalHandle.cpp isRedirection.cpp
+SRC = icsh.cpp parser.cpp execute.cpp signalHandle.cpp isRedirection.cpp jobs.cpp
 OBJ = $(SRC:.cpp=.o)
+
 all: $(TARGET)
 
 $(TARGET): $(SRC)
