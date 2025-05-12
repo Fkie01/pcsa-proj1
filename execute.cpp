@@ -23,17 +23,21 @@ int executeCommand(const std::vector<std::string> &args, bool background) {
 
   
   c_args.push_back(nullptr); // Null-terminate the array
+  command.push_back(nullptr);
   pid_t pid = fork();
   int exitCode = 0;
-
+  // std::cout << c_args[0] << std::endl;
   if (pid == 0) {
     setpgid(0, 0); // Set the process group ID to the child process ID
     // signal(SIGINT, SIG_DFL);
     // signal(SIGTSTP, SIG_DFL);
     if (execvp(c_args[0], c_args.data()) ) {
+      
       std::cerr << "Error executing command: " << c_args[0] << std::endl;
       exit(EXIT_FAILURE);
     }
+
+    
   } else if (pid > 0) {
     if (background){
       setpgid(pid, pid); // Set the process group ID to the child process ID

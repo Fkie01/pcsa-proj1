@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
   while (true) {
     // setupSignalHandlers(); // handle ctrl-c and ctrl-z
     bool isRedirection = false;
+    bool isPipe = false;
     bool background = false;
     // int redirectionPosition;
     if (inputStream == &std::cin) {
@@ -94,6 +95,10 @@ int main(int argc, char *argv[]) {
       for (size_t i = 1; i < args.size(); ++i) {
         if (std::string(args[i]) == ">" || std::string(args[i]) == "<") {
           isRedirection = true;
+          break;
+        }
+        else if (std::string(args[i]) == "|") {
+          isPipe = true;
           break;
         }
       }
@@ -162,12 +167,25 @@ int main(int argc, char *argv[]) {
     RedirectionType redir_type;
     char *fileName;
     std::strncpy(command_line, input.c_str(), MAX_LINE);
+    command_line[MAX_LINE - 1] = '\0'; // Ensure null termination
+    char *args1[MAX_ARGS];
+    char *args2[MAX_ARGS];
+
     if (isRedirection) {
       parse_command(command_line, argss, &redir_type, &fileName);
       handleRedirectionAndExecute(argss, redir_type, fileName);
 
       // exitCode = redirectExecuteCommand(args);
       // std::cout << "icsh $ " << std::flush;
+
+    } else if(isPipe) {
+      // std::cout << "pipe" << std::endl;
+      // std::cout << command_line << std::endl;
+      parse_PipeCommand(command_line, args1, args2);
+      // std::cout << "args1: " << args1[0] << std::endl;
+      // std::cout << "args2: " << args2[0] << std::endl;    
+      
+      handlePipeAndExecute(args1, args2);
 
     } else {
       exitCode = executeCommand(args, background);
